@@ -16,10 +16,10 @@ import { EquipoModule } from './equipo/equipo.module';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: process.env.DATABASE_URL || 'postgresql://postgres:prueba123.,@db.kbuaxipcmexwsqpngpqx.supabase.co:5432/postgres',
+      url: 'postgresql://postgres.kbuaxipcmexwsqpngpqx:prueba123.,@aws-1-us-east-1.pooler.supabase.com:5432/postgres',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Ideal dejarlo en true ahora para que cree las tablas en Supabase
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      synchronize: true, 
+      ssl: { rejectUnauthorized: false },
     }),
     EmpresaModule,
     EmpleadoModule,
