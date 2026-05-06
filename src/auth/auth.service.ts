@@ -60,4 +60,17 @@ export class AuthService {
   async perfil(userId: number) {
     return this.usuarioRepo.findOne({ where: { id: userId } });
   }
+  async crearAdminInicial(): Promise<void> {
+  const existe = await this.usuarioRepo.findOne({ where: { username: 'irma' } });
+  if (!existe) {
+    const hash = await bcrypt.hash('admin123', 10);
+    await this.usuarioRepo.save({
+      username: 'irma',
+      password: hash,
+      rol: RolUsuario.ADMIN,
+      empleado_id: null,
+    });
+    console.log('✅ Usuario admin creado automáticamente');
+  }
+}
 }

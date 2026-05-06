@@ -1,6 +1,4 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { EmpresaModule } from './empresa/empresa.module';
@@ -9,17 +7,16 @@ import { PrestamoModule } from './prestamo/prestamo.module';
 import { PagoCuotaModule } from './pago-cuota/pago-cuota.module';
 import { ConfiguracionModule } from './configuracion/configuracion.module';
 import { AuthModule } from './auth/auth.module';
-import { EquipoModule } from './equipo/equipo.module';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: 'postgresql://postgres.kbuaxipcmexwsqpngpqx:prueba123.,@aws-1-us-east-1.pooler.supabase.com:5432/postgres',
+      type: 'better-sqlite3',
+      database: 'prestamos.db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, 
-      ssl: { rejectUnauthorized: false },
+      synchronize: true,
     }),
     EmpresaModule,
     EmpleadoModule,
@@ -27,9 +24,12 @@ import { EquipoModule } from './equipo/equipo.module';
     PagoCuotaModule,
     ConfiguracionModule,
     AuthModule,
-    EquipoModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule { }
+export class AppModule implements OnModuleInit {
+  constructor(private authService: AuthService) {}
+
+  async onModuleInit() {
+    await this.authService.crearAdminInicial();
+  }
+}
