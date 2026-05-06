@@ -173,8 +173,8 @@ export class PrestamoService {
     };
   }
   async eliminar(id: number): Promise<void> {
-  await this.prestamoRepo.query(`DELETE FROM pago_cuota WHERE prestamoId = ${id}`);
-  await this.prestamoRepo.delete(id);
-}
+    await this.prestamoRepo.query(`DELETE FROM pago_cuota WHERE "prestamoId" = ${id}`);
+    await this.prestamoRepo.delete(id);
+  }
 }
 

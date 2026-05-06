@@ -43,10 +43,10 @@ export class EmpleadoService {
     );
   }
 
- async eliminar(id: number): Promise<void> {
-  await this.repo.query(`DELETE FROM pago_cuota WHERE prestamoId IN (SELECT id FROM prestamo WHERE empleadoId = ${id})`);
-  await this.repo.query(`DELETE FROM prestamo WHERE empleadoId = ${id}`);
-  await this.repo.query(`DELETE FROM usuario WHERE empleado_id = ${id}`);
-  await this.repo.query(`DELETE FROM empleado WHERE id = ${id}`);
-}
+  async eliminar(id: number): Promise<void> {
+    await this.repo.query(`DELETE FROM pago_cuota WHERE "prestamoId" IN (SELECT id FROM prestamo WHERE "empleadoId" = ${id})`);
+    await this.repo.query(`DELETE FROM prestamo WHERE "empleadoId" = ${id}`);
+    await this.repo.query(`DELETE FROM usuario WHERE empleado_id = ${id}`);
+    await this.repo.query(`DELETE FROM empleado WHERE id = ${id}`);
+  }
 }
