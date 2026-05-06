@@ -25,6 +25,7 @@ import { AuthService } from './auth/auth.service';
     ConfiguracionModule,
     AuthModule,
   ],
+  providers: [AuthService],
 })
 export class AppModule implements OnModuleInit {
   constructor(private authService: AuthService) {}
