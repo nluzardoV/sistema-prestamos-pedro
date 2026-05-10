@@ -12,7 +12,7 @@ import { EmpleadoService } from '../empleado/empleado.service';
 import { ConfiguracionService } from '../configuracion/configuracion.service';
 
 function calcularFechasQuincenas(fechaInicio: Date, cantidad: number): string[] {
-  const fechas = [];
+  const fechas: string[] = [];
   let current = new Date(fechaInicio);
   for (let i = 0; i < cantidad; i++) {
     const day = current.getDate();
