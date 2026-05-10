@@ -7,6 +7,7 @@ import { PrestamoModule } from './prestamo/prestamo.module';
 import { PagoCuotaModule } from './pago-cuota/pago-cuota.module';
 import { ConfiguracionModule } from './configuracion/configuracion.module';
 import { AuthModule } from './auth/auth.module';
+import { EquipoModule } from './equipo/equipo.module';
 
 @Module({
   imports: [
@@ -20,7 +21,12 @@ import { AuthModule } from './auth/auth.module';
           return {
             type: 'postgres',
             url: dbUrl,
-            ssl: { rejectUnauthorized: false },
+            ssl: true,
+            extra: {
+              ssl: {
+                rejectUnauthorized: false,
+              },
+            },
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
             synchronize: true,
           };
@@ -39,6 +45,7 @@ import { AuthModule } from './auth/auth.module';
     PagoCuotaModule,
     ConfiguracionModule,
     AuthModule,
+    EquipoModule,
   ],
 })
 export class AppModule {}

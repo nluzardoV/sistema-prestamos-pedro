@@ -1,7 +1,18 @@
-const db = require('better-sqlite3')('prestamos.db');
-console.log('Usuarios:', db.prepare('SELECT id, username, empleado_id FROM usuario').all());
-try {
-    console.log('Préstamos:', db.prepare('SELECT id, empleadoId FROM prestamo').all());
-} catch(e) {
-    console.log(e.message);
-}
+const { Client } = require('pg');
+
+const url = 'postgresql://postgres.kbuaxipcmexwsqpngpqx:Miclave2026@aws-1-us-east-1.pooler.supabase.com:6543/postgres';
+
+const client = new Client({
+  connectionString: url,
+  ssl: { rejectUnauthorized: false }
+});
+
+client.connect()
+  .then(() => {
+    console.log("✅ CONEXION EXITOSA A SUPABASE!");
+    client.end();
+  })
+  .catch(err => {
+    console.error("❌ ERROR DE CONEXION:", err.message);
+    client.end();
+  });
