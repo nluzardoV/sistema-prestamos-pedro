@@ -25,6 +25,9 @@ export class PagoCuota {
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
   monto_pagado: number;
 
+  @Column({ type: 'date', nullable: true })
+  fecha_esperada: string;
+
   @Column({ nullable: true })
   fecha_pago: string;
 

@@ -13,12 +13,14 @@ export class PrestamoController {
       empleadoId: number;
       costoEquipo: number;
       autorizadoPor?: string;
+      quincenas?: number;
     },
   ) {
     return this.prestamoService.crear(
       body.empleadoId,
       body.costoEquipo,
       body.autorizadoPor,
+      body.quincenas,
     );
   }
 

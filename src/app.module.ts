@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { EmpresaModule } from './empresa/empresa.module';
@@ -7,7 +7,6 @@ import { PrestamoModule } from './prestamo/prestamo.module';
 import { PagoCuotaModule } from './pago-cuota/pago-cuota.module';
 import { ConfiguracionModule } from './configuracion/configuracion.module';
 import { AuthModule } from './auth/auth.module';
-import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -25,12 +24,5 @@ import { AuthService } from './auth/auth.service';
     ConfiguracionModule,
     AuthModule,
   ],
-  providers: [AuthService],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private authService: AuthService) {}
-
-  async onModuleInit() {
-    await this.authService.crearAdminInicial();
-  }
-}
+export class AppModule {}

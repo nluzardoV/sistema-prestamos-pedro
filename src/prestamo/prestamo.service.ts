@@ -11,6 +11,26 @@ import { EstadoPago } from '../pago-cuota/pago-cuota.enum';
 import { EmpleadoService } from '../empleado/empleado.service';
 import { ConfiguracionService } from '../configuracion/configuracion.service';
 
+function calcularFechasQuincenas(fechaInicio: Date, cantidad: number): string[] {
+  const fechas = [];
+  let current = new Date(fechaInicio);
+  for (let i = 0; i < cantidad; i++) {
+    const day = current.getDate();
+    const month = current.getMonth();
+    const year = current.getFullYear();
+
+    if (day < 15) {
+      fechas.push(`${year}-${String(month + 1).padStart(2, '0')}-15`);
+      current = new Date(year, month, 16);
+    } else {
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      fechas.push(`${year}-${String(month + 1).padStart(2, '0')}-${lastDay}`);
+      current = new Date(year, month + 1, 1);
+    }
+  }
+  return fechas;
+}
+
 @Injectable()
 export class PrestamoService {
   constructor(
@@ -22,7 +42,7 @@ export class PrestamoService {
     private configService: ConfiguracionService,
   ) {}
 
-  async crear(empleadoId: number, costoEquipo: number, autorizadoPor?: string) {
+  async crear(empleadoId: number, costoEquipo: number, autorizadoPor?: string, quincenasParam?: number) {
     const empleado = await this.empleadoService.buscarPorId(empleadoId);
 
     const mesesMin = await this.configService.get('MESES_ANTIGUEDAD_MIN');
@@ -61,7 +81,7 @@ export class PrestamoService {
     );
 
     const factor = 3.8; // Factor de préstamo es 3.8
-    const quincenas = Number(await this.configService.get('QUINCENAS')) || 24;
+    const quincenas = quincenasParam || Number(await this.configService.get('QUINCENAS')) || 24;
     const precioVenta = costoEquipo * factor;
     const cuotaQuincenal = precioVenta / quincenas;
 
@@ -91,6 +111,8 @@ export class PrestamoService {
 
     const prestamoGuardado = await this.prestamoRepo.save(prestamo);
 
+    const fechasEsperadas = calcularFechasQuincenas(new Date(), quincenas);
+
     const pagos: PagoCuota[] = [];
     for (let i = 1; i <= quincenas; i++) {
       const pago = new PagoCuota();
@@ -99,6 +121,7 @@ export class PrestamoService {
       pago.monto_esperado = cuotaQuincenal;
       pago.estado = EstadoPago.PENDIENTE;
       pago.recargo_fijo = 0;
+      pago.fecha_esperada = fechasEsperadas[i - 1];
       pagos.push(pago);
     }
     await this.pagoRepo.save(pagos);
