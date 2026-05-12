@@ -35,6 +35,15 @@ export class Empleado {
   @Column({ default: true })
   activo: boolean;
 
+  @Column({ nullable: true })
+  banco: string;
+
+  @Column({ nullable: true })
+  numero_cuenta: string;
+
+  @Column({ nullable: true })
+  tipo_cuenta: string;
+
   @ManyToOne(() => Empresa, (empresa) => empresa.empleados)
   empresa: Empresa;
 
