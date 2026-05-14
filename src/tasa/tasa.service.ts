@@ -22,6 +22,7 @@ export class TasaService implements OnModuleInit {
     const tasas = Array.isArray(data) ? data : [];
     const tipos = [TipoTasa.BCV, TipoTasa.PARALELO];
     const actualizadas: Tasa[] = [];
+    let paralelo: number | null = null;
 
     for (const tipo of tipos) {
       const tasaApi = tasas.find((item) => this.esTipoTasa(item, tipo));
@@ -33,9 +34,10 @@ export class TasaService implements OnModuleInit {
       if (!tasa) tasa = this.repo.create({ tipo });
       tasa.valor = valor;
       actualizadas.push(await this.repo.save(tasa));
+      if (tipo === TipoTasa.PARALELO) paralelo = valor;
     }
 
-    const binance = await this.obtenerTasaBinance();
+    const binance = await this.obtenerTasaBinance(paralelo);
     if (binance) {
       let tasa = await this.repo.findOne({ where: { tipo: TipoTasa.BINANCE } });
       if (!tasa) tasa = this.repo.create({ tipo: TipoTasa.BINANCE });
@@ -60,7 +62,7 @@ export class TasaService implements OnModuleInit {
     return false;
   }
 
-  private async obtenerTasaBinance(): Promise<number | null> {
+  private async obtenerTasaBinance(paralelo: number | null): Promise<number | null> {
     const { data } = await axios.post('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
       asset: 'USDT',
       fiat: 'VES',
@@ -68,11 +70,26 @@ export class TasaService implements OnModuleInit {
       page: 1,
       payTypes: [],
       publisherType: null,
-      rows: 1,
+      rows: 10,
       tradeType: 'SELL',
     });
 
-    const precio = Number(data?.data?.[0]?.adv?.price);
-    return Number.isFinite(precio) && precio > 0 ? precio : null;
+    const precios = Array.isArray(data?.data)
+      ? data.data
+          .map((item) => Number(item?.adv?.price))
+          .filter((precio) => Number.isFinite(precio) && precio > 0)
+          .sort((a, b) => a - b)
+      : [];
+
+    if (!precios.length) return null;
+
+    const medio = Math.floor(precios.length / 2);
+    const mediana = precios.length % 2 === 0
+      ? (precios[medio - 1] + precios[medio]) / 2
+      : precios[medio];
+
+    if (paralelo && Math.abs((mediana - paralelo) / paralelo) > 0.2) return null;
+
+    return mediana;
   }
 }
