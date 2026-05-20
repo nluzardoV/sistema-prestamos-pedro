@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PrestamoService } from './prestamo.service';
 
@@ -72,5 +72,11 @@ export class PrestamoController {
     @Body() body: { recargoFijo: number },
   ) {
     return this.prestamoService.marcarMora(+pagoId, body.recargoFijo);
+  }
+
+  @Delete(':id')
+  async eliminar(@Param('id') id: string) {
+    await this.prestamoService.eliminar(+id);
+    return { mensaje: 'Préstamo eliminado exitosamente' };
   }
 }
