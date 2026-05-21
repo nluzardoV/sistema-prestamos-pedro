@@ -12,6 +12,8 @@ export class PrestamoController {
     body: {
       empleadoId: number;
       costoEquipo: number;
+      pagoInicial?: number;
+      gananciaInteres?: number;
       autorizadoPor?: string;
       quincenas?: number;
     },
@@ -19,6 +21,8 @@ export class PrestamoController {
     return this.prestamoService.crear(
       body.empleadoId,
       body.costoEquipo,
+      body.pagoInicial,
+      body.gananciaInteres,
       body.autorizadoPor,
       body.quincenas,
     );

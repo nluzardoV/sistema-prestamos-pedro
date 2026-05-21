@@ -12,10 +12,7 @@ export class ConfiguracionService implements OnModuleInit {
 
   async onModuleInit() {
     const defaults = [
-      { clave: 'FACTOR_PRECIO', valor: '3.8' },
       { clave: 'IVA', valor: '0.16' },
-      { clave: 'LIMITE_LIQUIDACION_PCT', valor: '70' },
-      { clave: 'MESES_ANTIGUEDAD_MIN', valor: '6' },
       { clave: 'QUINCENAS', valor: '24' },
     ];
     for (const d of defaults) {

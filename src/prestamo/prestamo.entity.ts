@@ -28,8 +28,11 @@ export class Prestamo {
   @Column('decimal', { precision: 10, scale: 2 })
   costo_equipo: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  factor: number;
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  pago_inicial: number;
+
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  ganancia_interes: number;
 
   @Column('decimal', { precision: 10, scale: 2 })
   precio_venta: number;

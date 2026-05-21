@@ -42,18 +42,15 @@ export class PrestamoService {
     private configService: ConfiguracionService,
   ) {}
 
-  async crear(empleadoId: number, costoEquipo: number, autorizadoPor?: string, quincenasParam?: number) {
+  async crear(
+    empleadoId: number,
+    costoEquipo: number,
+    pagoInicialParam?: number,
+    gananciaInteresParam?: number,
+    autorizadoPor?: string,
+    quincenasParam?: number,
+  ) {
     const empleado = await this.empleadoService.buscarPorId(empleadoId);
-
-    const mesesMin = await this.configService.get('MESES_ANTIGUEDAD_MIN');
-    const antiguedad = this.empleadoService.calcularAntiguedadMeses(
-      empleado.fecha_ingreso,
-    );
-    if (antiguedad < mesesMin) {
-      throw new BadRequestException(
-        `El empleado tiene ${antiguedad} meses de antigüedad. Se requieren mínimo ${mesesMin} meses.`,
-      );
-    }
 
     // 1. Obtener préstamos activos del cliente
     const prestamosAnteriores = await this.prestamoRepo.find({
@@ -80,28 +77,18 @@ export class PrestamoService {
       0,
     );
 
-    const factor = 3.8; // Factor de préstamo es 3.8
     const quincenas = quincenasParam || Number(await this.configService.get('QUINCENAS')) || 24;
-    const precioVenta = costoEquipo * factor;
+    const pagoInicial = Number(pagoInicialParam) || 0;
+    const gananciaInteres = Number(gananciaInteresParam) || 0;
+    const saldoRestante = Math.max(Number(costoEquipo) - pagoInicial, 0);
+    const precioVenta = saldoRestante + gananciaInteres;
     const cuotaQuincenal = precioVenta / quincenas;
-
-    const deudaTotal = deudaAnterior + precioVenta;
-
-    const limitePct = 70; // 70% de la liquidación
-    const liquidacion = Number(empleado.monto_liquidacion_actual); // Convertir decimal de TypeORM a número
-    const limiteValor = (liquidacion * limitePct) / 100;
-
-    // 4. Validación de Garantía
-    if (deudaTotal > limiteValor) {
-      throw new BadRequestException(
-        `Capacidad de crédito excedida. La deuda total ($${deudaTotal.toFixed(2)}) superaría la garantía de liquidación ($${limiteValor.toFixed(2)}).`,
-      );
-    }
 
     const prestamo = new Prestamo();
     prestamo.empleado = empleado;
     prestamo.costo_equipo = costoEquipo;
-    prestamo.factor = factor;
+    prestamo.pago_inicial = pagoInicial;
+    prestamo.ganancia_interes = gananciaInteres;
     prestamo.precio_venta = precioVenta;
     prestamo.cuota_quincenal = cuotaQuincenal;
     prestamo.estado = autorizadoPor
