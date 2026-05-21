@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from '../auth/admin.guard';
 import { PrestamoService } from './prestamo.service';
 
 @Controller('prestamos')
 export class PrestamoController {
   constructor(private readonly prestamoService: PrestamoService) {}
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Post()
   crear(
     @Body()
@@ -28,6 +30,7 @@ export class PrestamoController {
     );
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Get()
   listar() {
     return this.prestamoService.listar();
@@ -43,21 +46,13 @@ export class PrestamoController {
     return prestamos;
   }
 
-  @Get('debug/dump')
-  async debugDump() {
-    const prestamos = await this.prestamoService.listar();
-    return prestamos.map(p => ({
-      id: p.id,
-      empleadoId: p.empleado?.id,
-      empleadoNombre: p.empleado?.nombre,
-    }));
-  }
-
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Get(':id')
   buscar(@Param('id') id: string) {
     return this.prestamoService.buscarPorId(+id);
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Post('pago/:pagoId')
   registrarPago(
     @Param('pagoId') pagoId: string,
@@ -70,6 +65,7 @@ export class PrestamoController {
     );
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Post('mora/:pagoId')
   marcarMora(
     @Param('pagoId') pagoId: string,
@@ -78,6 +74,7 @@ export class PrestamoController {
     return this.prestamoService.marcarMora(+pagoId, body.recargoFijo);
   }
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':id')
   async eliminar(@Param('id') id: string) {
     await this.prestamoService.eliminar(+id);

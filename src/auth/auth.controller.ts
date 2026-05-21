@@ -6,14 +6,16 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { RolUsuario } from './auth.entity';
-import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from './admin.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Post('registro')
   registrar(
     @Body()
